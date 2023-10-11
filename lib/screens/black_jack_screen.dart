@@ -136,6 +136,16 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
 
     playerScore =
         deckOfCards[playerFirstCard]! + deckOfCards[playerSecondCard]!;
+
+    if (dealerScore <= 16) {
+      String thirdDealersCardKey =
+          playingCards.keys.elementAt(random.nextInt(playingCards.length));
+      playingCards.removeWhere((key, value) => key == thirdDealersCardKey);
+
+      dealersCards.add(Image.asset(thirdDealersCardKey));
+
+      dealerScore = dealerScore + deckOfCards[thirdDealersCardKey]!;
+    }
   }
 
   void addCard() {
