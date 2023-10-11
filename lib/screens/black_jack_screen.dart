@@ -1,6 +1,9 @@
 import 'dart:math';
 
+import 'package:black_jack/widgets/my_button.dart';
 import 'package:flutter/material.dart';
+
+import '../widgets/cards_grid_view.dart';
 
 class BlackJackScreen extends StatefulWidget {
   const BlackJackScreen({super.key});
@@ -137,7 +140,17 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
     playerScore =
         deckOfCards[playerFirstCard]! + deckOfCards[playerSecondCard]!;
 
-    if (dealerScore <= 16) {
+    // if (dealerScore <= 17) {
+    //   String thirdDealersCardKey =
+    //       playingCards.keys.elementAt(random.nextInt(playingCards.length));
+    //   playingCards.removeWhere((key, value) => key == thirdDealersCardKey);
+
+    //   dealersCards.add(Image.asset(thirdDealersCardKey));
+
+    //   dealerScore = dealerScore + deckOfCards[thirdDealersCardKey]!;
+    // }
+
+    while (dealerScore <= 17) {
       String thirdDealersCardKey =
           playingCards.keys.elementAt(random.nextInt(playingCards.length));
       playingCards.removeWhere((key, value) => key == thirdDealersCardKey);
@@ -188,22 +201,7 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
                         const SizedBox(
                           height: 20,
                         ),
-                        Container(
-                          height: 200,
-                          child: GridView.builder(
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                              ),
-                              itemCount: dealersCards.length,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 8.0),
-                                  child: dealersCards[index],
-                                );
-                              }),
-                        ),
+                        CardsGridView(cards: dealersCards),
                       ],
                     ),
                     // player cards
@@ -220,22 +218,7 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
                         const SizedBox(
                           height: 20,
                         ),
-                        Container(
-                          height: 200,
-                          child: GridView.builder(
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                              ),
-                              itemCount: myCards.length,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 8.0),
-                                  child: myCards[index],
-                                );
-                              }),
-                        ),
+                        CardsGridView(cards: myCards),
                       ],
                     ),
                     // 2 buttons
@@ -244,18 +227,20 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          MaterialButton(
-                            onPressed: addCard,
-                            color: Colors.deepPurple[200],
-                            child: const Text('Another Card'),
-                          ),
-                          MaterialButton(
-                            onPressed: () {
-                              changeCards();
-                            },
-                            color: Colors.deepPurple[200],
-                            child: const Text('Next Round'),
-                          ),
+                          MyButton(onPressed: addCard, label: 'Another Card'),
+                          MyButton(onPressed: changeCards, label: 'Next Round'),
+                          // MaterialButton(
+                          //   onPressed: addCard,
+                          //   color: Colors.deepPurple[200],
+                          //   child: const Text('Another Card'),
+                          // ),
+                          // MaterialButton(
+                          //   onPressed: () {
+                          //     changeCards();
+                          //   },
+                          //   color: Colors.deepPurple[200],
+                          //   child: const Text('Next Round'),
+                          // ),
                         ],
                       ),
                     )
@@ -264,13 +249,14 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
               ),
             )
           : Center(
-              child: MaterialButton(
-                onPressed: () {
-                  changeCards();
-                },
-                color: Colors.deepPurple[200],
-                child: const Text('Start Game'),
-              ),
+              child: MyButton(onPressed: () => changeCards(), label: 'Start Game'),
+              // child: MaterialButton(
+              //   onPressed: () {
+              //     changeCards();
+              //   },
+              //   color: Colors.deepPurple[200],
+              //   child: const Text('Start Game'),
+              // ),
             ),
     );
   }
