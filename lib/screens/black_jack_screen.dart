@@ -134,7 +134,22 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
         deckOfCards[playerFirstCard]! + deckOfCards[playerSecondCard]!;
   }
 
-  void addCard() {}
+  void addCard() {
+    Random random = Random();
+
+    if (playingCards.length > 0) {
+      String cardKey =
+          playingCards.keys.elementAt(random.nextInt(playingCards.length));
+
+      playingCards.removeWhere((key, value) => key == cardKey);
+
+      setState(() {
+        myCards.add(Image.asset(cardKey));
+      });
+
+      playerScore = playerScore + deckOfCards[cardKey]!;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -160,9 +175,12 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
                                 crossAxisCount: 3,
                               ),
                               itemCount: dealersCards.length,
-                              physics: NeverScrollableScrollPhysics(),
                               itemBuilder: (context, index) {
-                                return dealersCards[index];
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: dealersCards[index],
+                                );
                               }),
                         ),
                       ],
@@ -182,9 +200,12 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
                                 crossAxisCount: 3,
                               ),
                               itemCount: myCards.length,
-                              physics: NeverScrollableScrollPhysics(),
                               itemBuilder: (context, index) {
-                                return myCards[index];
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: myCards[index],
+                                );
                               }),
                         ),
                       ],
