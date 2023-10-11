@@ -177,7 +177,14 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
                     // dealer cards
                     Column(
                       children: [
-                        Text('Dealer score $dealerScore'),
+                        Text(
+                          'Dealer score $dealerScore',
+                          style: TextStyle(
+                            color: dealerScore <= 21
+                                ? Colors.green[900]
+                                : Colors.red[900],
+                          ),
+                        ),
                         const SizedBox(
                           height: 20,
                         ),
@@ -202,7 +209,14 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
                     // player cards
                     Column(
                       children: [
-                        Text('Player score $playerScore'),
+                        Text(
+                          'Player score $playerScore',
+                          style: TextStyle(
+                            color: playerScore <= 21
+                                ? Colors.green[900]
+                                : Colors.red[900],
+                          ),
+                        ),
                         const SizedBox(
                           height: 20,
                         ),
