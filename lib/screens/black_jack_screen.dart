@@ -93,6 +93,10 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
       isGameStarted = true;
     });
 
+    playingCards = {};
+
+    playingCards.addAll(deckOfCards);
+
     myCards = [];
     dealersCards = [];
 
@@ -222,7 +226,9 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
                             child: const Text('Another Card'),
                           ),
                           MaterialButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              changeCards();
+                            },
                             color: Colors.deepPurple[200],
                             child: const Text('Next Round'),
                           ),
