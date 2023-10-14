@@ -27,6 +27,15 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
   int playerScore = 0;
   int dealerScore = 0;
 
+  bool winnerDealer = false;
+  bool winnerPlayer = false;
+  bool isDraw = false;
+
+  String isWinner = '';
+  bool isStand = false;
+
+  bool isShowScore = false;
+
   final Map<String, int> deckOfCards = {
     "cards/2.1.png": 2,
     "cards/2.2.png": 2,
@@ -94,6 +103,11 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
   void changeCards() {
     setState(() {
       isGameStarted = true;
+      winnerDealer = false;
+      winnerPlayer = false;
+      isDraw = false;
+      isWinner = '';
+      isStand = false;
     });
 
     playingCards = {};
@@ -140,17 +154,22 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
     playerScore =
         deckOfCards[playerFirstCard]! + deckOfCards[playerSecondCard]!;
 
-    // if (dealerScore <= 17) {
-    //   String thirdDealersCardKey =
-    //       playingCards.keys.elementAt(random.nextInt(playingCards.length));
-    //   playingCards.removeWhere((key, value) => key == thirdDealersCardKey);
-
-    //   dealersCards.add(Image.asset(thirdDealersCardKey));
-
-    //   dealerScore = dealerScore + deckOfCards[thirdDealersCardKey]!;
+    // IS WORK
+    if (playerScore == 21) {
+      isWinner = 'Player';
+      winnerPlayer = true;
+      showAlertDialog();
+    }
+    // else if (dealerScore == 21) {
+    //   isWinner = 'Dealer';
+    //   winnerDealer = true;
     // }
+  }
 
-    while (dealerScore <= 17) {
+  void stand() {
+    Random random = Random();
+
+    while (dealerScore < 17) {
       String thirdDealersCardKey =
           playingCards.keys.elementAt(random.nextInt(playingCards.length));
       playingCards.removeWhere((key, value) => key == thirdDealersCardKey);
@@ -159,6 +178,33 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
 
       dealerScore = dealerScore + deckOfCards[thirdDealersCardKey]!;
     }
+
+    if (dealerScore == 21) {
+      isWinner = 'Dealer';
+      winnerDealer = true;
+    } else if (playerScore == dealerScore) {
+      isDraw = true;
+    }
+
+    if (dealerScore > 21) {
+      isWinner = 'Player';
+      winnerPlayer = true;
+    }
+
+    if (playerScore < 22 && dealerScore < 22 && dealerScore < playerScore) {
+      isWinner = 'Player';
+      winnerPlayer = true;
+    } else if (dealerScore < 22 &&
+        playerScore < 22 &&
+        playerScore < dealerScore) {
+      isWinner = 'Dealer';
+      winnerDealer = true;
+    }
+
+    setState(() {
+      isStand = !isStand;
+      isWinner;
+    });
   }
 
   void addCard() {
@@ -176,11 +222,96 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
 
       playerScore = playerScore + deckOfCards[cardKey]!;
     }
+
+    if (playerScore > 21) {
+      isStand = !isStand;
+      isWinner = 'Dealer';
+      winnerDealer = true;
+    }
+
+    if (dealerScore > 21) {
+      isWinner = 'Player';
+      winnerPlayer = true;
+    }
+
+    if (playerScore == 21) {
+      isWinner = 'Player';
+      winnerPlayer = true;
+      showAlertDialog();
+      stand();
+    }
+  }
+
+  void showAlertDialog() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          Future.delayed(const Duration(seconds: 2), () {
+            Navigator.of(context).pop(true);
+          });
+          return AlertDialog(
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.local_fire_department,
+                  color: Color.fromARGB(210, 201, 43, 11),
+                ),
+                const Icon(
+                  Icons.local_fire_department,
+                  color: Color.fromARGB(210, 201, 43, 11),
+                ),
+                const Icon(
+                  Icons.local_fire_department,
+                  color: Color.fromARGB(210, 201, 43, 11),
+                ),
+                Text(
+                  '$playerScore',
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                const Icon(
+                  Icons.local_fire_department,
+                  color: Color.fromARGB(210, 201, 43, 11),
+                ),
+                const Icon(
+                  Icons.local_fire_department,
+                  color: Color.fromARGB(210, 201, 43, 11),
+                ),
+                const Icon(
+                  Icons.local_fire_department,
+                  color: Color.fromARGB(210, 201, 43, 11),
+                ),
+              ],
+            ),
+          );
+        });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+          child: SafeArea(
+        child: Column(
+          children: [
+            CheckboxListTile(
+              title: const Text('Show Score'),
+              activeColor: Colors.deepPurple[200],
+              value: isShowScore,
+              onChanged: (bool? value) {
+                setState(() {
+                  isShowScore = value!;
+                });
+              },
+            ),
+          ],
+        ),
+      )),
+      appBar: AppBar(
+        title: const Text('Black Jack'),
+        centerTitle: true,
+        backgroundColor: Colors.deepPurple[200],
+      ),
       body: isGameStarted
           ? SafeArea(
               child: Center(
@@ -201,20 +332,43 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
                         const SizedBox(
                           height: 20,
                         ),
-                        CardsGridView(cards: dealersCards),
+                        Stack(children: [
+                          CardsGridView(cards: dealersCards),
+                          isStand
+                              ? Container()
+                              : Positioned(
+                                  width: 85,
+                                  height: 200,
+                                  left: 155,
+                                  bottom: 35,
+                                  child: Image.asset('cards/shirt.png'),
+                                ),
+                        ]),
                       ],
                     ),
+                    Center(
+                      child: isDraw
+                          ? const Text('DRAW')
+                          : winnerDealer || winnerPlayer
+                              ? Text('The Winner is $isWinner')
+                              : Container(),
+                    ),
+                    // Center(
+                    //   child: Text('$isStand'),
+                    // ),
                     // player cards
                     Column(
                       children: [
-                        Text(
-                          'Player score $playerScore',
-                          style: TextStyle(
-                            color: playerScore <= 21
-                                ? Colors.green[900]
-                                : Colors.red[900],
-                          ),
-                        ),
+                        isShowScore
+                            ? Text(
+                                'Player score $playerScore',
+                                style: TextStyle(
+                                  color: playerScore <= 21
+                                      ? Colors.green[900]
+                                      : Colors.red[900],
+                                ),
+                              )
+                            : Container(),
                         const SizedBox(
                           height: 20,
                         ),
@@ -224,23 +378,31 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
                     // 2 buttons
                     IntrinsicWidth(
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        // mainAxisSize: MainAxisSize.min,
+                        // crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          MyButton(onPressed: addCard, label: 'Another Card'),
-                          MyButton(onPressed: changeCards, label: 'Next Round'),
-                          // MaterialButton(
-                          //   onPressed: addCard,
-                          //   color: Colors.deepPurple[200],
-                          //   child: const Text('Another Card'),
-                          // ),
-                          // MaterialButton(
-                          //   onPressed: () {
-                          //     changeCards();
-                          //   },
-                          //   color: Colors.deepPurple[200],
-                          //   child: const Text('Next Round'),
-                          // ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: winnerDealer || winnerPlayer || isDraw
+                                ? [Container()]
+                                : [
+                                    MyButton(
+                                      onPressed: addCard,
+                                      label: 'Hit',
+                                    ),
+                                    const SizedBox(
+                                      width: 20,
+                                    ),
+                                    MyButton(
+                                      onPressed: stand,
+                                      label: 'Stand',
+                                    ),
+                                  ],
+                          ),
+                          winnerDealer || winnerPlayer || isDraw
+                              ? MyButton(
+                                  onPressed: changeCards, label: 'Next Round')
+                              : Container(),
                         ],
                       ),
                     )
@@ -249,14 +411,10 @@ class _BlackJackScreenState extends State<BlackJackScreen> {
               ),
             )
           : Center(
-              child: MyButton(onPressed: () => changeCards(), label: 'Start Game'),
-              // child: MaterialButton(
-              //   onPressed: () {
-              //     changeCards();
-              //   },
-              //   color: Colors.deepPurple[200],
-              //   child: const Text('Start Game'),
-              // ),
+              child: MyButton(
+                onPressed: () => changeCards(),
+                label: 'Start Game',
+              ),
             ),
     );
   }
